@@ -65,6 +65,11 @@ router.get('/create-promo/:name/:avantage', (req, res) => {
         return res.status(400).send("lt or gt age interval is missing in query");
     }
 
+    (eq !== 40) ? res.status(400).send("Eq must be 40!") : true;
+    (lt >= 15 && lt <= 35) ? true : res.status(400).send("lt must be between 15 and 35!");
+    (gt >= 15 && gt <= 35) ? true : res.status(400).send("gt must be between 15 and 35!");
+    (lt > gt) ? true : res.status(400).send("lt must be higher than gt!");
+
     if (eq && !lt && !gt) {
         buildPromocode.restrictions["@age"] = { "eq": eq };
         logger.debug(`Age restrictions builded, age only equal to ${eq}`);
@@ -166,14 +171,18 @@ router.post('/ask-promo', (req, res) => {
         status: ''
     }
 
+    
+    let filePromo = jsonfile.readFileSync('./promos.json');
+
+    //verification age (pas assez de temps pour le faire)
+
+
     // Getting the weather
     getWeather(city)
     .then(results => {
         logger.info(`Retrieve weather from city succeed`, results);
         console.log(results.weather[0].main)
 
-        //comparing openweathermap temp with restrictions
-        let filePromo = jsonfile.readFileSync('./promos.json');
         // Si même nom de code promo
         if (userData.promocode_name === filePromo.name) {
             // Si le temps correspond

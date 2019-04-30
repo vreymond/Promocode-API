@@ -1,5 +1,5 @@
 
-# Todo List API
+# Promocode API
 
 [![NodeJs](https://img.shields.io/badge/code-NodeJs-brightgreen.svg)](https://nodejs.org/en/)
 [![Javascript](https://img.shields.io/badge/code-JavaScript-blue.svg)]()
@@ -82,15 +82,54 @@ All the routes have been tested using the [Insomnia program](https://insomnia.re
 
 You can access the API by using the URL ```http://localhost:<portAPI>/``` (default port is 3000).
 
-### 2°) API create promo route
+### 2°) API create promo route (GET)
 
 Creating a promo code route using query string URL
 
 ```
-http://localhost:3000/create-promo/superpromo/20?age=eq40lt30gt15&end=test&start=test&meteo=clair&temp=gt15
+http://localhost:3000/create-promo/WeatherCode/20?age=eq40lt30gt15&end=test&start=test&meteo=clair&temp=gt15
 
 age query must be like eq<value>lt<value>gt<value>
 (eq and lt/gt are optional, but lt (or gt) cannot exist without gt (or lt))
+
+end and start date are not implemented
+```
+Server response:
+
+```
+{
+  "message": "WeatherCode promo created!"
+}
+```
+
+### 3°) API ask promo (POST)
+
+Request a promo code depending on the weather:
+
+```
+http://localhost:3000/ask-promo
+
+with post body:
+{
+    "promocode_name": "WeatherCode",
+    "arguments": {
+        "age": 25,"meteo": { 
+            "town":"Paris"
+            }
+    }
+}
+```
+
+Server response:
+
+```
+{
+  "promocode_name": "WeatherCode",
+  "status": "accepted",
+  "avantage": {
+    "percent": "20"
+  }
+}
 ```
 
 # Contributors

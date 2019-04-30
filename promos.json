@@ -1,6 +1,6 @@
 {
-  "_id": "12479a21-a6d3-4827-9b41-2f2f989dc949",
-  "name": "superpromo",
+  "_id": "d98b07e5-7d8a-471c-980b-69415314fe8d",
+  "name": "WeatherCode",
   "avantage": {
     "percent": "20"
   },
@@ -13,8 +13,8 @@
       },
       {
         "@age": {
-          "lt": 30,
-          "gt": 15
+          "lt": 18,
+          "gt": 17
         }
       }
     ],
