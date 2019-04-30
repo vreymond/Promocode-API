@@ -22,9 +22,9 @@ router.get('/create-promo/:name/:avantage', (req, res) => {
     // }
     let age = req.query.age;
     !age ? res.status(400).send("Age query field is required") : true;
-    let dateAfter = req.query.dateAfter;
+    let dateAfter = req.query.end;
     !dateAfter ? res.status(400).send("dateAfter query field is required") : true;
-    let dateBefore = req.query.dateBefore;
+    let dateBefore = req.query.start;
     !dateBefore ? res.status(400).send("dateAfter query field is required") : true;
     let meteoStatus = req.query.meteo;
     !meteoStatus ? res.status(400).send("meteo query field is required") : true;
@@ -38,7 +38,15 @@ router.get('/create-promo/:name/:avantage', (req, res) => {
         restrictions : {}
     }
     
-    // Age extract and adding to promo code
+    /* Age extract and adding to promo code
+
+        This part will verify the age string given in the route query.
+        We build the restrictions age part with 3 differents cases:
+            - only eq (equal to) value given
+            - only lt and gt (lesser than / greater than) value given
+            - eq and lt / gt values given
+        Others cases return an error to the client.
+    */
     let arrayExtract = age.split(/([0-9]+)/);
     arrayExtract.pop(); // removing last empty element
 
@@ -81,6 +89,29 @@ router.get('/create-promo/:name/:avantage', (req, res) => {
     }
 
     logger.debug(JSON.stringify(buildPromocode.restrictions))
+
+
+    /* Meteo extracting part and restrictions build
+    
+    Par manque de temps, je n'ai traité que le cas "gt", il aurait fallu 
+    factoriser le code précédent dans une fonction que l'on aurait pu appeller 
+    pour la vérification a la fois de l'age et de la météo.
+    
+    */
+   let arrayExtractMeteo = meteoTemp.split(/([0-9]+)/);
+   let gtMeteo = '';
+
+   if(arrayExtractMeteo[0] === "eq") gtMeteo = arrayExtractMeteo[1];
+  
+
+    buildPromocode.restrictions["@meteo"] = {
+        "is": meteoStatus,
+        "temp": {
+            gt: gtMeteo
+        } 
+    }
+
+    logger.debug(JSON.stringify(buildPromocode.restrictions))
 })
 
 router.post('/ask-promo', (req, res) => {
@@ -114,34 +145,6 @@ router.post('/ask-promo', (req, res) => {
 
 })
 
-// PROMOCODE :
-let promocode = {
-    _id: '...',
-    name: 'WeatherCode',
-    avantage: { percent: 20 },
-    restrictions: {
-        _or: [{
-            _age: {
-                eq: 40
-            }
-        }, {
-            _age: {
-                lt: 30,
-                gt: 15
-            },
-        }],
-        _date: {
-            after: '2017-05-02',
-            before: '2018-05-02',
-        },
-        _meteo: {
-            is: 'clear',
-            temp: {
-                gt: '15', // Celsius here.
-            }
-        }
-    }
-};
 
 getWeather('Lyon')
     .then(results => {
@@ -152,7 +155,7 @@ getWeather('Lyon')
     })
 
 async function getWeather (city) {
-    console.log(weatherAPI + city + weatherID)
+
     let res = await fetch(weatherAPI + city + weatherID);
     let weatherJson = res.json();
 
